@@ -1,11 +1,13 @@
-cd ~/Downloads/MessageX && \
-xcodebuild -project MessageX.xcodeproj -scheme MessageX \
-  -resolvePackageDependencies \
-  -clonedSourcePackagesDirPath SourcePackages \
-  CODE_SIGNING_ALLOWED=NO 2>&1 | tail -5 && \
-echo "--- PACKAGES RESOLVED, BUILDING ---" && \
-xcodebuild -project MessageX.xcodeproj -scheme MessageX \
-  -destination "generic/platform=iOS Simulator" \
-  -clonedSourcePackagesDirPath SourcePackages \
+# 1. Delete the stale DerivedData
+rm -rf ~/Library/Developer/Xcode/DerivedData/MessageX-*
+
+# 2. Build fresh, targeting active arch only (arm64 on Apple Silicon)
+cd ~/Downloads/IOS\ projects/MessageX
+xcodebuild \
+  -project MessageX.xcodeproj \
+  -scheme MessageX \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  ONLY_ACTIVE_ARCH=YES \
   CODE_SIGNING_ALLOWED=NO \
-  build 2>&1 | grep -E "error:|warning:|BUILD SUCCEEDED|BUILD FAILED" | tail -30
+  CODE_SIGNING_REQUIRED=NO \
+  build 2>&1 | tail -60
